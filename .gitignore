@@ -1,0 +1,17 @@
+
+
+/node_modules
+/vendor
+.env
+/storage/*.key
+/public/storage
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
+
+# Abaikan juga folder profile cache-nya Puppeteer biar gak nyampah
+C:/Users/Public/PuppeteerProfile_*
