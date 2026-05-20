@@ -15,3 +15,6 @@ Route::get('/nct', function () {
 Route::get('/tweekend', function () {
     return view('tweekend');
 });
+Route::get('/westlife', function () {
+    return view('westlife');
+});
