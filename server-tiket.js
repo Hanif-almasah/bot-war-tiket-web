@@ -7,6 +7,7 @@ app.use(bodyParser.json());
 
 // 🔥 UBAH MENJADI ARRAY: Menyimpan daftar session bot yang sedang aktif
 let activeSessions = []; 
+let clickCounter = 0;
 
 app.post('/api/start-war', async (req, res) => {
     const { urlTarget, selector, targetIndex = 2 } = req.body; // ✅ Fix #2: tambah targetIndex dari req.body
@@ -31,24 +32,33 @@ app.post('/api/start-war', async (req, res) => {
     // Kirim respon sukses ke HP tanpa menunggu proses loop selesai
     res.json({ status: 'success', message: `Bot session #${sessionId} berhasil dipicu!` });
 
-    try { // ✅ Fix #1: try block yang sebelumnya tidak ditutup
-        const browser = await puppeteer.launch({ 
-            headless: false, 
-            defaultViewport: null,
+    try {
+        clickCounter++; // Naikkan hitungan setiap tombol di HP diklik
+        
+        let targetFolder = '';
+
+        // JIKA MASIH DI BAWAH ATAU SAMA DENGAN 15 KLIK
+        if (clickCounter <= 15) {
+            targetFolder = `D:/bot-warTiket-edge/PuppeteerProfile_WarTiket_Slot_${clickCounter}`;
+            console.log(`🚀 [Klik #${clickCounter}] Menggunakan Slot Login Terpaku: Slot ${clickCounter}`);
+        } 
+        // JIKA SUDAH BRUTAL (KLIK KE-16 DAN SETERUSNYA)
+        else {
+            targetFolder = `D:/bot-warTiket-edge/PuppeteerProfile_${sessionId}`;
+            console.log(`🔥 [Klik #${clickCounter}] Slot Utama Penuh! Pindah ke Mode Timestamp: Profil #${sessionId}`);
+        }
+
+        console.log(`📁 Lokasi Folder Cache: ${targetFolder}`);
+
+        // Jalankan Puppeteer dengan folder yang sudah ditentukan di atas
+        const browser = await puppeteer.launch({
+            headless: false,
             executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
             ignoreDefaultArgs: ['--enable-automation'], 
             args: [
-                '--disable-blink-features=AutomationControlled', 
-                '--no-sandbox',
-
-                //Timestamp per sessionId untuk memastikan setiap session punya folder profile yang unik, mencegah konflik data antar session
-                `--user-data-dir=D:\\bot-warTiket-edge\\PuppeteerProfile_${sessionId}`,
-
-                // 🔥 KODE BARU (KUNCI JADI 1 FOLDER SAJA)
-                // '--user-data-dir=D:/bot-warTiket-edge/PuppeteerProfile_WarTiket',
-
-                // '--user-data-dir=C:\\Users\\almasa\\AppData\\Local\\Microsoft\\Edge\\User Data',
-                // 🔥 TAMBAHKAN KAWALAN PARAMETER INI BIAR EDGE GAK CEREWET 🔥
+                '--start-maximized',
+                `--user-data-dir=${targetFolder}`, 
+                '--disable-blink-features=AutomationControlled',
                 '--no-first-run',                 // Lewati halaman "Selamat Datang" pertama kali install
                 '--no-default-browser-check',      // Jangan tanya apakah mau dijadikan browser utama
                 '--disable-features=Translate',    // Matikan pop-up auto-translate bahasa
@@ -145,9 +155,11 @@ app.post('/api/stop-war', async (req, res) => {
         }
     }
 
-    // Kosongkan array antrean
-    activeSessions = [];
-    res.json({ status: 'success', message: 'Semua engine bot berhasil dihentikan!' });
+    // 🔥 RESET HITUNGAN JADI NOL KEMBALI 🔥
+    clickCounter = 0; 
+    console.log("🛑 Semua browser dimatikan. Counter klik di-reset ke 0.");
+    
+    res.json({ status: 'success', message: 'Semua browser berhasil dihentikan.' });
 });
 
 app.listen(3000, () => console.log('API Bot Multi-Session standby di port 3000...'));
