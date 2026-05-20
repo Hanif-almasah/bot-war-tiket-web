@@ -15,6 +15,7 @@
                 <a class="nav-link" href="/">Dashboard</a>
                 <a class="nav-link" href="/nct">nct</a>
                 <a class="nav-link" href="/tweekend">tweekend</a>
+                <a class="nav-link" href="/westlife">Westlife</a>
             </div>
         </div>
     </nav>
